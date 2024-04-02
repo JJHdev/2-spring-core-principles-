@@ -1,0 +1,44 @@
+1. 객체 지향 설계와 스프링
+  1.1 다형성에서 역할과 구현으로 구분하면 편하다. 
+    -> 로미오와 줄리엣에서 로미오 (역할)은 어떤 배우든지 할수 있다. (역할은 인터페이스), (배우는 구현객체) 여러 배우들이 모여 연극(어플리케이션)이 만들어지는데 만약 배우가 몸이 아파 다른 배우를 캐스팅해도 배우는 자신의 역할을 알고 익혀있으니 돌아갈수 있다.
+    -> 클라이언트는 대상의 역할(인터페이스)만 알면되고, 구현 대상의 내부구조는 몰라도 된다.
+    -> public class MemberService {
+        // private MemberRepository memberRepository = new MemoryMemberRepository();
+         private MemberRepository memberRepository = new JdbcMemberRepository();
+      }
+      코드로 보면 이렇게 표현할수 있다.
+      
+  1.2 OCP는 개방폐쇄의 원칙인데 확장에는 열려있으며, 변경에는 닫혀있어야 한다는것인데, 기능을 확장할려면 코드를 변경해야 하는데, 어떻게 그럴수있을까?
+    -> public class MemberService {
+        // private MemberRepository memberRepository = new MemoryMemberRepository();
+         private MemberRepository memberRepository = new JdbcMemberRepository();
+      } 1.2 위반
+    
+  1.3 DIP의존관계 역전의 원칙 “추상화에 의존해야지, 구체화에 의존하면 안된다.” 쉽게 이야기해서 구현 클래스에 의존하지 말고, 인터페이스에 의존하라는 뜻
+    -> MemberRepository m = new MemoryMemberRepository(); 1.3 위반
+    
+  1.4 다형성 만으로는 OCP, DIP를 지킬 수 없다. 그리하여 스프링의 기술로 OCP, DIP를 지킬 수 있도록 해준다.. 
+
+
+2. 스프링 핵심 원리 이해1 - 예제 만들기
+
+
+3. 스프링 핵심 원리 이해2 - 객체 지향 원리 적용
+
+
+4. 스프링 컨테이너와 스프링 빈
+
+
+5. 싱글톤 컨테이너
+
+
+6. 컴포넌트 스캔
+
+
+7. 의존관계 자동 주입
+
+
+8. 빈 생명주기 콜백
+
+
+9. 빈 스코프
