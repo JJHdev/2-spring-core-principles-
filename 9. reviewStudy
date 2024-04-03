@@ -21,13 +21,74 @@
 
 
 2. 스프링 핵심 원리 이해1 - 예제 만들기
-
+  2.1 MemberService memberService = new MemberServiceImpl(); 이렇게 설계를 하면 구현객체에게 의존하게 된다. (구현객체가아닌 추상화에 의존해야한다.)
 
 3. 스프링 핵심 원리 이해2 - 객체 지향 원리 적용
+  3.1 > 2.1에서 구현클래스에 의존하는 문제점을 확인할 수 있었다. 이를 해결할려면 어떻게 해야할까?
+      > AppConfig의 등장으로 이를 해결할수 있다. (애플리케이션의 전체 동작 방식을 구성(config)하기 위해, 구현 객체를 생성하고, 연결하는 책임을 가지는 별도의 설정 클래스를 만들자.) // Spring 애노테이션 사용하기전.
+      > public class AppConfig {
 
+            public MemberService memberService() {
+                return new MemberServiceImpl(new MemoryMemberRepository());
+            }
+            public OrderService orderService() {
+                return new OrderServiceImpl(new MemoryMemberRepository(), new FixDiscountPolicy());
+            }
+        }
+    > 위와 같은 설정으로 아래와 같이 의존관계를 맺을수 있게 되었다. (생성자로 통해서 의존관계를 맺어야 한다.)
+      MemberServiceImpl MemoryMemberRepository
+      OrderServiceImpl MemoryMemberRepository , FixDiscountPolicy
+
+    3.2 실제 코드로 보자면 아래와 같다. (AppConfig class)
+         private final MemberRepository memberRepository;
+         private final DiscountPolicy discountPolicy;
+
+         public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+             this.memberRepository = memberRepository;
+             this.discountPolicy = discountPolicy;
+         }
+
+    3.3 실제 test코드에서는 아래와 같이 실행하면 된다. 
+        AppConfig appConfig = new AppConfig();
+        MemberService memberService = appConfig.memberService();
+
+      0, AppConfig 처럼 객체를 생성하고 관리하면서 의존관계를 연결해 주는 것을 IoC 컨테이너 또는 DI 컨테이너라 한다. 
+
+    3.4 >> 3.3 처럼 객체를 사용해야하는데 이것을 스프링으로 전환해서 사용해보자 
+      -. @Configuration
+         public class AppConfig {
+         
+             @Bean
+             public MemberService memberService() {
+                 return new MemberServiceImpl(memberRepository());
+             }
+    
+             @Bean
+             public OrderService orderService() {
+                 return new OrderServiceImpl( memberRepository(), discountPolicy());
+             }
+    
+             @Bean
+             public MemberRepository memberRepository() {
+                 return new MemoryMemberRepository();
+             }
+             @Bean
+             public DiscountPolicy discountPolicy() {
+                 return new RateDiscountPolicy();
+             }
+        }
+
+      -> @Configuration과 @Bean을 붙여준다.
+      -> ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
+         MemberService memberService = applicationContext.getBean("memberService", MemberService.class);
+
+      -> 방식으로 사용이 가능하다. 
 
 4. 스프링 컨테이너와 스프링 빈
-
+    4.1 ApplicationContext를(+ BeanFactory) 스프링 컨테이너라 한다.그리고 이는 인터페이스다.
+          -> 그리고 XML기반으로 만들수 있고, 애노테이션 기반의 자바 설정클래스로 만들수 있다.
+    4.2  3.4처럼 스프링컨테이너 안에 Bean 안에 이름과 객체를 저장한다.
+    4.3 
 
 5. 싱글톤 컨테이너
 
