@@ -88,10 +88,79 @@
     4.1 ApplicationContext를(+ BeanFactory) 스프링 컨테이너라 한다.그리고 이는 인터페이스다.
           -> 그리고 XML기반으로 만들수 있고, 애노테이션 기반의 자바 설정클래스로 만들수 있다.
     4.2  3.4처럼 스프링컨테이너 안에 Bean 안에 이름과 객체를 저장한다.
-    4.3 
+
+    4.3 컨테이너에 등록된 빈 자체를 조회해보자!
+      -> AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+          -. 모든 빈 조회하기.
+          -. String[] beanDefinitionNames = ac.getBeanDefinitionNames();
+          -. ac.getBean(beanDefinitionName);
+          -. (beanDefinition.getRole()을 하면 2가지 역할이 있다. (스프링내부에서 사용하는 빈, 사용자가 정의한 빈 등으로 구분해서 조회할수 있다.)
+          -. BeanDefinition.ROLE_APPLICATION(사용자정의) //   ROLE_INFRASTRUCTURE(스프링 내부 정의빈)
+
+          -. 특정 빈 조회하기.
+          -. MemberService memberService = ac.getBean("memberService", MemberService.class);  //   
+              ac.getBean(MemberService.class);  // ac.getBean(빈이름, 타입)
+          
+          -. 특정 빈 조회하기. (동일한 타입이 둘이상 >> 빈이름이 다르던가, Map으로 받을수 있다.)
+          -. MemberRepository memberRepository = ac.getBean("memberRepository1", MemberRepository.class);
+          -. Map<String, MemberRepository> beansOfType = ac.getBeansOfType(MemberRepository.class);
+
+
+      4.4 BeanFactory와 ApplicationContext 에대해서
+        -. <BeanFactory>라는 인터페이스를 상속 받은 ApplicationContext 인터페이스를 상속받은 AnnoattionConfigApplicationContext가 있다.
+        -. BeanFactory를 상속받아서 ApplicationContext에서 이용이 가능하다 그런데 ApplicationContext의 차이점은 뭘까? 
+          -. ApplicationContext는 다른인터페이스를 추가로 상속받아 메시지소스를 활용한 국제화기능, 환경변수, 애플리케이션 이벤트, 편리한 리소스 조회등 추가 기능이 있다.
+        -. ApplicationContext라는 인터페이스를 상속받아 이를 만들수 있는 설정정보들은 여러가지가 있는데 이는 AnnotationConfigApplicationContext (appConfig.class), GenericXmlApplicationContext (appConfig.xml) 설정으로
+            스프링컨테이너 설정정보를 설정할수 있다.
+
+      4.5 XML을 기반으로 스프링컨테이너 만드는법은
+        -.  <bean id="memberRepository"  class="hello.core.member.MemoryMemberRepository" />
+            <bean id="orderService" class="hello.core.order.OrderServiceImpl">
+                <constructor-arg name="memberRepository" ref="memberRepository" />
+            </bean>
+  
+        -. ApplicationContext ac = new GenericXmlApplicationContext("appConfig.xml");
+        -. MemberService memberService = ac.getBean("memberService", MemberService.class);
+
+      4.6 AnnotationConfigApplicationContext, GenericXmlApplicationContext은 BeanDefinition라는 추상화를 이용하여 각 설정을 유연하게 읽어서 셋팅한다.
 
 5. 싱글톤 컨테이너
+  5.1 싱글톤 패턴이 없는 객체 생성
+     AppConfig appConfig = new AppConfig();
+     //1. 조회: 호출할 때 마다 객체를 생성
+     MemberService memberService1 = appConfig.memberService();
+     //2. 조회: 호출할 때 마다 객체를 생성
+     MemberService memberService2 = appConfig.memberService();
 
+  5.2 싱글톤 패턴 적용된 객체
+  //1. static 영역에 객체를 딱 1개만 생성해둔다.
+    private static final SingletonService instance = new SingletonService();
+  //2. public으로 열어서 객체 인스턴스가 필요하면 이 static 메서드를 통해서만 조회하도록 허용한다.
+    public static SingletonService getInstance() {
+        return instance;
+    }
+
+   //1. 조회: 호출할 때 마다 같은 객체를 반환
+     SingletonService singletonService1 = SingletonService.getInstance();
+   //2. 조회: 호출할 때 마다 같은 객체를 반환
+     SingletonService singletonService2 = SingletonService.getInstance();
+
+  5.3 위와 같이 싱글톤 패턴을 적용해서 사용시 코드자체가 많아지고 OCP원칙을 위반할 가능성이 높아진다.
+      스프링컨테이너를 이용하여 스프링빈을 사용하는데 이는 싱글톤으로 관리되는 빈이다. 
+
+    ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+    
+  //1. 조회: 호출할 때 마다 같은 객체를 반환
+    MemberService memberService1 = ac.getBean("memberService",  MemberService.class);
+  //2. 조회: 호출할 때 마다 같은 객체를 반환
+    MemberService memberService2 = ac.getBean("memberService", MemberService.class);
+
+  5.4 싱글톤 패턴이든, 스프링 같은 싱글톤컨테이너를 사용하든 이는 하나의 객체를 공유하기 떄문에 stateful하게 설계하면 안된다.
+    -. 무상태(stateless)로 설계해야 한다!
+    특정 클라이언트에 의존적인 필드가 있으면 안된다.
+    특정 클라이언트가 값을 변경할 수 있는 필드가 있으면 안된다!
+    가급적 읽기만 가능해야 한다.
+    필드 대신에 자바에서 공유되지 않는, 지역변수, 파라미터, ThreadLocal 등을 사용해야 한다
 
 6. 컴포넌트 스캔
 
