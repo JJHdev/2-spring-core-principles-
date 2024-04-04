@@ -202,12 +202,42 @@
 
     -. 주로 클래스 빈은 자동으로 스캔되어 등록되는 경우가 많고, 메소드 빈은 개발자가 명시적으로 빈을 정의하고 등록해야 합니다. 메소드 빈은 더 세밀한 설정이 필요한 경우에 유용하게 사용될 수 있습니다.
 
-
-
-
-
 7. 의존관계 자동 주입
+  7.1 의존관계 주입방법에는 (1. 생성자주입, 2. 수정자주입(setter) 3. 필드주입 4. 일반메서드 주입 이 있다.
+  7.2 기존에 사용하던방법은 (생성자 주입)
+  7.3 수정자 주입  @Autowired
+                  public void setMemberRepository(MemberRepository memberRepository) {
+                      this.memberRepository = memberRepository;
+                  }
+  7.4 필드 주입 @Autowired
+               private MemberRepository memberRepository;
 
+  7.5 //호출 안됨
+      @Autowired(required = false)
+      public void setNoBean1(Member member) {
+           System.out.println("setNoBean1 = " + member);
+      }
+      //null 호출
+      @Autowired
+      public void setNoBean2(@Nullable Member member) {
+           System.out.println("setNoBean2 = " + member);
+      }
+      //Optional.empty 호출
+      @Autowired(required = false)
+      public void setNoBean3(Optional<Member> member) { 
+          System.out.println("setNoBean3 = " + member);
+      }
+
+  -. @Autowired
+     private DiscountPolicy discountPolicy
+    이 코드와 유사하게 동작하는 코드는 ac.getBean(DiscountPolicy.class) 이코드 이다. (타입으로 조회한다.)
+
+  -. @AutoWired는 의존성주입에 사용하는 애노테이션으로 필드, 생성자, setter 메소드에 사용이 가능하다.
+    -> 이 애노테이션을 사용하면 처음에는 타입에 매칭하고 타입의 결과가 2개일 경우 필드명, 파라미터 명으로 빈이름을 매칭한다.
+
+  -. 빈을 조회시 map과 List로 조회도 가능하다.
+
+  -. 
 
 8. 빈 생명주기 콜백
 
