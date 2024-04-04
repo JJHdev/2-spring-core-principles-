@@ -237,9 +237,29 @@
 
   -. 빈을 조회시 map과 List로 조회도 가능하다.
 
-  -. 
-
 8. 빈 생명주기 콜백
+  8.1 스프링 빈의 이벤트 라이프사이클
+      스프링 컨테이너 생성 -->>  스프링 빈 생성 -->> 의존관계 주입 -->> 초기화 콜백 -->> 사용 -->> 소멸전 콜백 -->> 스프링 종료
+  
+  8.2 스프링은 크게 3가지 방법으로 빈 생명주기 콜백을 지원한다.
+    -. 인터페이스(InitializingBean, DisposableBean)
+    -. 설정 정보에 초기화 메서드, 종료 메서드 지정
+    -. @PostConstruct, @PreDestroy 애노테이션 지원
 
+  8.2 인터페이스 방식 : public class NetworkClient implements InitializingBean, DisposableBean { } 하여 Override를 하여 초기화, 소멸전 콜백을 사용할 수있다.
+
+  8.3 설정정보에 지정 방식 : @Bean(initMethod = "init", destroyMethod = "close")
+
+  8.4 @PostConstruct
+      public void init() {
+          System.out.println("NetworkClient.init");
+          connect();
+          call("초기화 연결 메시지");
+      }
+      @PreDestroy
+      public void close() {
+          System.out.println("NetworkClient.close");
+          disConnect();
+      }
 
 9. 빈 스코프
