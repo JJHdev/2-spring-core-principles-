@@ -262,6 +262,16 @@
           disConnect();
       }
 
+    % @Component 애노테이션이 붙은 클래스는 주로 기본적인 컴포넌트를 스프링에게 인식시키는 용도로 사용되며, @Bean 애노테이션은 더 세밀한 빈 설정을 위해 사용됩니다
+    % @Configuration, @ComponentScan, @Component, @Autowired , @Bean 의 특징들
+      1. @Configuration, @ComponentScan 의 차이
+        -. @Configuration은 명시적으로 개발자가 스프링빈으로 등록하고 내부이 @Bean을 통해 등록된다. @ComponentScan은 하위 클래스단위에 특정 애노테이션이 붙을경우 스캔대상으로 스프링 빈으로 등록된다.
+        -. @Configuration을 사용하여 설정을 정의하면 해당 클래스를 컨테이너의 설정으로 인식하고, 내부의 @Bean 메소드를 호출하여 빈을 생성합니다. 
+
+      2. @Component와 @Bean으로 스프링빈을 등록이 가능한데 @ComponentScan대상에 없을경우 프로토스코프로 생성되고, @ComponentScan대상에 있을 경우 싱글톤으로 관리된다.
+      3. @Autowired로 의존관계를 맺으면 자동의존관계주입이고, @Bean을 통해서 맺을수도 있는데 이는 수동의존관계주입이다.
+      4. 
+
 9. 빈 스코프
   9.1  스코프는 번역 그대로 빈이 존재할 수 있는 범위를 뜻한다.
   9.2 싱글톤: 기본 스코프, 스프링 컨테이너의 시작과 종료까지 유지되는 가장 넓은 범위의 스코프이다.
